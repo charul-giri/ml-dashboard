@@ -24,7 +24,6 @@ from sklearn.metrics import (
 # ── Page config ───────────────────────────────────────────────────────────────
 st.set_page_config(
     page_title="ML Model Comparison",
-    page_icon="🤖",
     layout="wide",
     initial_sidebar_state="expanded"
 )
@@ -145,10 +144,10 @@ def train_regression(ds_name):
 
 # ── Sidebar ───────────────────────────────────────────────────────────────────
 with st.sidebar:
-    st.markdown("## 🤖 ML Dashboard")
+    st.markdown("##  ML Dashboard")
     st.markdown("---")
     task = st.radio("**Select Task**",
-                    ["🔵 Classification", "🟠 Regression"],
+                    [" Classification", " Regression"],
                     label_visibility="collapsed")
     st.markdown("---")
     if "Classification" in task:
@@ -167,7 +166,7 @@ with st.sidebar:
 # ── Hero ──────────────────────────────────────────────────────────────────────
 st.markdown("""
 <div class='hero'>
-  <h1>🤖 ML MODEL COMPARISON DASHBOARD</h1>
+  <h1> ML MODEL COMPARISON DASHBOARD</h1>
   <p>Classification &amp; Regression &nbsp;|&nbsp; 5 Datasets &nbsp;|&nbsp; 4 Algorithms &nbsp;|&nbsp; All Metrics</p>
 </div>""", unsafe_allow_html=True)
 
@@ -175,7 +174,7 @@ st.markdown("""
 # CLASSIFICATION
 # ══════════════════════════════════════════════════════════════════════════════
 if "Classification" in task:
-    st.markdown(f"<div class='section-title' style='color:#58a6ff;'>🔵 Classification — {ds_name}</div>",
+    st.markdown(f"<div class='section-title' style='color:#58a6ff;'> Classification — {ds_name}</div>",
                 unsafe_allow_html=True)
 
     with st.spinner(f"Training all models on {ds_name}..."):
@@ -195,11 +194,11 @@ if "Classification" in task:
           <div class='metric-name'>{m}<br><span style='color:#58a6ff; font-size:0.85em;'>{best}</span></div>
         </div>""", unsafe_allow_html=True)
 
-    st.markdown(f"<div class='best-card'>🏆 &nbsp;<b>Best Model: {best}</b> &nbsp;·&nbsp; F1 = {df_r.loc[best,'F1 Score']:.2f}% &nbsp;·&nbsp; ROC-AUC = {df_r.loc[best,'ROC-AUC']:.4f}</div>",
+    st.markdown(f"<div class='best-card'> &nbsp;<b>Best Model: {best}</b> &nbsp;·&nbsp; F1 = {df_r.loc[best,'F1 Score']:.2f}% &nbsp;·&nbsp; ROC-AUC = {df_r.loc[best,'ROC-AUC']:.4f}</div>",
                 unsafe_allow_html=True)
 
     # ── Results table ──
-    st.markdown("#### 📋 All Models Comparison")
+    st.markdown("####  All Models Comparison")
     styled = df_r.style\
         .highlight_max(subset=['Accuracy','Precision','Recall','F1 Score','ROC-AUC'],
                        color='#1a4731')\
@@ -209,7 +208,7 @@ if "Classification" in task:
     st.dataframe(styled, use_container_width=True)
 
     # ── Metric bar charts ──
-    st.markdown("#### 📊 Metric Comparison")
+    st.markdown("####  Metric Comparison")
     fig, axes = plt.subplots(1, 5, figsize=(18, 3.5))
     fig.patch.set_facecolor('#0d1117')
     for ax, m in zip(axes, metrics):
@@ -226,7 +225,7 @@ if "Classification" in task:
 
     # ── Confusion Matrices ──
     if show_cm:
-        st.markdown("#### 🔥 Confusion Matrices")
+        st.markdown("####  Confusion Matrices")
         fig, axes = plt.subplots(1, 4, figsize=(20, 4))
         fig.patch.set_facecolor('#0d1117')
         for ax, (mname, (yp, yprob, yte)) in zip(axes, preds.items()):
@@ -245,7 +244,7 @@ if "Classification" in task:
 
     # ── ROC Curves ──
     if show_roc and is_bin:
-        st.markdown("#### 📉 ROC Curves")
+        st.markdown("####  ROC Curves")
         fig, ax = plt.subplots(figsize=(7, 5))
         fig.patch.set_facecolor('#0d1117')
         for (mname, (yp, yprob, yte)), color in zip(preds.items(), COLORS):
@@ -263,7 +262,7 @@ if "Classification" in task:
 
     # ── Learning Curves ──
     if show_lc:
-        st.markdown("#### 📚 Learning Curves")
+        st.markdown("####  Learning Curves")
         fig, axes = plt.subplots(1, 4, figsize=(20, 4))
         fig.patch.set_facecolor('#0d1117')
         for ax, (mname, make) in zip(axes, CLF_MODELS.items()):
@@ -290,7 +289,7 @@ if "Classification" in task:
 # REGRESSION
 # ══════════════════════════════════════════════════════════════════════════════
 else:
-    st.markdown(f"<div class='section-title' style='color:#ff9500;'>🟠 Regression — {ds_name}</div>",
+    st.markdown(f"<div class='section-title' style='color:#ff9500;'> Regression — {ds_name}</div>",
                 unsafe_allow_html=True)
 
     with st.spinner(f"Training all models on {ds_name}..."):
@@ -308,11 +307,11 @@ else:
           <div class='metric-name'>{m}<br><span style='color:#ff9500; font-size:0.85em;'>{best}</span></div>
         </div>""", unsafe_allow_html=True)
 
-    st.markdown(f"<div class='best-card'>🏆 &nbsp;<b>Best Model: {best}</b> &nbsp;·&nbsp; R² = {df_r.loc[best,'R² Score']:.4f} &nbsp;·&nbsp; RMSE = {df_r.loc[best,'RMSE']:.4f}</div>",
+    st.markdown(f"<div class='best-card'> &nbsp;<b>Best Model: {best}</b> &nbsp;·&nbsp; R² = {df_r.loc[best,'R² Score']:.4f} &nbsp;·&nbsp; RMSE = {df_r.loc[best,'RMSE']:.4f}</div>",
                 unsafe_allow_html=True)
 
     # ── Results table ──
-    st.markdown("#### 📋 All Models Comparison")
+    st.markdown("####  All Models Comparison")
     styled = df_r.style\
         .highlight_max(subset=['R² Score'], color='#1a4731')\
         .highlight_min(subset=['MAE','MSE','RMSE'], color='#1a3a1a')\
@@ -320,7 +319,7 @@ else:
     st.dataframe(styled, use_container_width=True)
 
     # ── Metric bar charts ──
-    st.markdown("#### 📊 Metric Comparison")
+    st.markdown("####  Metric Comparison")
     fig, axes = plt.subplots(1, 4, figsize=(16, 3.5))
     fig.patch.set_facecolor('#0d1117')
     for ax, m in zip(axes, ['MAE','MSE','RMSE','R² Score']):
@@ -354,7 +353,7 @@ else:
 
     # ── Learning Curves ──
     if show_lc:
-        st.markdown("#### 📚 Learning Curves")
+        st.markdown("####  Learning Curves")
         fig, axes = plt.subplots(1, 4, figsize=(20, 4))
         fig.patch.set_facecolor('#0d1117')
         for ax, (mname, make) in zip(axes, REG_MODELS.items()):
