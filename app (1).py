@@ -20,7 +20,7 @@ from sklearn.metrics import (
     mean_absolute_error, mean_squared_error, r2_score
 )
 
-st.set_page_config(page_title="ML Dashboard", page_icon="🤖", layout="wide")
+st.set_page_config(page_title="ML Dashboard", page_icon=, layout="wide")
 
 st.markdown("""
 <style>
@@ -67,7 +67,6 @@ REG_MODELS = {
     'SVR':               lambda: SVR(kernel='rbf'),
 }
 
-# ── Training functions ────────────────────────────────────────────────────────
 @st.cache_data(show_spinner=False)
 def run_clf(ds_name):
     data = CLF_LOADERS[ds_name](as_frame=True)
@@ -142,9 +141,8 @@ def run_custom_reg(X, y):
         preds[mn]=(yp,yte)
     return pd.DataFrame(rows).set_index('Model'), preds, X_sc, y
 
-# ── EDA ───────────────────────────────────────────────────────────────────────
 def show_eda(df, target_col, task_type):
-    st.markdown("### 📊 Exploratory Data Analysis")
+    st.markdown("###  Exploratory Data Analysis")
     c1,c2,c3,c4 = st.columns(4)
     c1.markdown(f"<div class='mcard'><div class='mval'>{df.shape[0]}</div><div class='mname'>Rows</div></div>",unsafe_allow_html=True)
     c2.markdown(f"<div class='mcard'><div class='mval'>{df.shape[1]-1}</div><div class='mname'>Features</div></div>",unsafe_allow_html=True)
@@ -154,25 +152,25 @@ def show_eda(df, target_col, task_type):
     else:
         c4.markdown(f"<div class='mcard'><div class='mval'>{df[target_col].round(2).mean()}</div><div class='mname'>Target Mean</div></div>",unsafe_allow_html=True)
 
-    with st.expander("🔍 Dataset Preview (first 10 rows)", expanded=True):
+    with st.expander(" Dataset Preview (first 10 rows)", expanded=True):
         st.dataframe(df.head(10).style.set_properties(
             **{'background-color':'#161b22','color':'#c9d1d9','border':'1px solid #30363d'}),
             use_container_width=True)
 
-    with st.expander("📐 Statistical Summary"):
+    with st.expander(" Statistical Summary"):
         st.dataframe(df.describe().round(4).style.set_properties(
             **{'background-color':'#161b22','color':'#c9d1d9','border':'1px solid #30363d'}),
             use_container_width=True)
 
     if int(df.isnull().sum().sum()) == 0:
-        st.markdown("<div class='info'>✅ &nbsp;<b>No missing values — dataset is clean!</b></div>",unsafe_allow_html=True)
+        st.markdown("<div class='info'> &nbsp;<b>No missing values — dataset is clean!</b></div>",unsafe_allow_html=True)
     else:
-        with st.expander("⚠️ Missing Values per Column"):
+        with st.expander(" Missing Values per Column"):
             missing = df.isnull().sum()[df.isnull().sum()>0]
             st.dataframe(missing.rename("Missing Count").to_frame(), use_container_width=True)
 
-    # Target distribution
-    st.markdown("#### 🎯 Target Distribution")
+ 
+    st.markdown("####  Target Distribution")
     fig, ax = plt.subplots(figsize=(7,3.5)); fig.patch.set_facecolor('#0d1117')
     if task_type == "Classification":
         counts = df[target_col].value_counts()
@@ -192,10 +190,9 @@ def show_eda(df, target_col, task_type):
     ax.spines[['top','right']].set_visible(False)
     plt.tight_layout(); st.pyplot(fig); plt.close()
 
-    # Feature histograms
     num_cols = [c for c in df.select_dtypes(include=np.number).columns if c != target_col][:8]
     if num_cols:
-        st.markdown("#### 📈 Feature Distributions")
+        st.markdown("####  Feature Distributions")
         n = len(num_cols); ncols = min(4,n); nrows = (n+ncols-1)//ncols
         fig, axes = plt.subplots(nrows, ncols, figsize=(ncols*4, nrows*3))
         fig.patch.set_facecolor('#0d1117')
@@ -207,9 +204,8 @@ def show_eda(df, target_col, task_type):
         for ax in axes[n:]: ax.set_visible(False)
         plt.tight_layout(); st.pyplot(fig); plt.close()
 
-    # Correlation heatmap
     if len(num_cols) >= 2:
-        st.markdown("#### 🔥 Correlation Heatmap")
+        st.markdown("####  Correlation Heatmap")
         corr_cols = num_cols[:10] + ([target_col] if pd.api.types.is_numeric_dtype(df[target_col]) else [])
         corr = df[corr_cols].corr()
         fig, ax = plt.subplots(figsize=(max(7, len(corr_cols)), max(4, len(corr_cols)-2)))
@@ -220,7 +216,6 @@ def show_eda(df, target_col, task_type):
         ax.tick_params(axis='x', rotation=45); ax.tick_params(axis='y', rotation=0)
         plt.tight_layout(); st.pyplot(fig); plt.close()
 
-# ── Classification results renderer ──────────────────────────────────────────
 def show_clf_results(df_r, preds, target_names, is_bin, X_sc, y, show_cm, show_roc, show_lc):
     best = df_r['F1 Score'].idxmax()
     metrics = ['Accuracy','Precision','Recall','F1 Score','ROC-AUC']
@@ -228,15 +223,15 @@ def show_clf_results(df_r, preds, target_names, is_bin, X_sc, y, show_cm, show_r
     for col,m in zip(cols, metrics):
         v = df_r.loc[best,m]; sfx = '%' if m != 'ROC-AUC' else ''
         col.markdown(f"<div class='mcard'><div class='mval'>{v}{sfx}</div><div class='mname'>{m}<br><span style='color:#58a6ff;font-size:0.85em;'>{best}</span></div></div>",unsafe_allow_html=True)
-    st.markdown(f"<div class='best'>🏆 <b>Best Model: {best}</b> · F1={df_r.loc[best,'F1 Score']:.2f}% · ROC-AUC={df_r.loc[best,'ROC-AUC']:.4f}</div>",unsafe_allow_html=True)
+    st.markdown(f"<div class='best'> <b>Best Model: {best}</b> · F1={df_r.loc[best,'F1 Score']:.2f}% · ROC-AUC={df_r.loc[best,'ROC-AUC']:.4f}</div>",unsafe_allow_html=True)
 
-    st.markdown("#### 📋 All Models Comparison")
+    st.markdown("####  All Models Comparison")
     st.dataframe(df_r.style
         .highlight_max(subset=metrics, color='#1a4731')
         .format({'Accuracy':'{:.2f}%','Precision':'{:.2f}%','Recall':'{:.2f}%','F1 Score':'{:.2f}%','ROC-AUC':'{:.4f}'})
         .set_properties(**{'text-align':'center'}), use_container_width=True)
 
-    st.markdown("#### 📊 Metric Comparison")
+    st.markdown("####  Metric Comparison")
     fig, axes = plt.subplots(1,5,figsize=(18,3.5)); fig.patch.set_facecolor('#0d1117')
     for ax,m in zip(axes, metrics):
         vals=df_r[m]; bars=ax.bar(vals.index, vals.values, color=COLORS, edgecolor='#0d1117', width=0.5)
@@ -248,7 +243,7 @@ def show_clf_results(df_r, preds, target_names, is_bin, X_sc, y, show_cm, show_r
     plt.tight_layout(); st.pyplot(fig); plt.close()
 
     if show_cm:
-        st.markdown("#### 🔥 Confusion Matrices")
+        st.markdown("#### Confusion Matrices")
         fig, axes = plt.subplots(1,4,figsize=(20,4)); fig.patch.set_facecolor('#0d1117')
         for ax,(mn,(yp,yprob,yte)) in zip(axes, preds.items()):
             cm=confusion_matrix(yte,yp)
@@ -261,7 +256,7 @@ def show_clf_results(df_r, preds, target_names, is_bin, X_sc, y, show_cm, show_r
         plt.tight_layout(); st.pyplot(fig); plt.close()
 
     if show_roc and is_bin:
-        st.markdown("#### 📉 ROC Curves")
+        st.markdown("####  ROC Curves")
         fig, ax = plt.subplots(figsize=(7,5)); fig.patch.set_facecolor('#0d1117')
         for (mn,(yp,yprob,yte)),color in zip(preds.items(), COLORS):
             fpr,tpr,_=roc_curve(yte,yprob[:,1]); rv=auc(fpr,tpr)
@@ -290,21 +285,20 @@ def show_clf_results(df_r, preds, target_names, is_bin, X_sc, y, show_cm, show_r
             ax.grid(True,alpha=0.2); ax.spines[['top','right']].set_visible(False)
         plt.tight_layout(); st.pyplot(fig); plt.close()
 
-# ── Regression results renderer ───────────────────────────────────────────────
 def show_reg_results(df_r, preds, X_sc, y, show_avp, show_lc):
     best = df_r['R² Score'].idxmax()
     cols = st.columns(4)
     for col,m in zip(cols,['MAE','MSE','RMSE','R² Score']):
         col.markdown(f"<div class='mcard'><div class='mval'>{df_r.loc[best,m]}</div><div class='mname'>{m}<br><span style='color:#ff9500;font-size:0.85em;'>{best}</span></div></div>",unsafe_allow_html=True)
-    st.markdown(f"<div class='best'>🏆 <b>Best Model: {best}</b> · R²={df_r.loc[best,'R² Score']:.4f} · RMSE={df_r.loc[best,'RMSE']:.4f}</div>",unsafe_allow_html=True)
+    st.markdown(f"<div class='best'> <b>Best Model: {best}</b> · R²={df_r.loc[best,'R² Score']:.4f} · RMSE={df_r.loc[best,'RMSE']:.4f}</div>",unsafe_allow_html=True)
 
-    st.markdown("#### 📋 All Models Comparison")
+    st.markdown("####  All Models Comparison")
     st.dataframe(df_r.style
         .highlight_max(subset=['R² Score'],color='#1a4731')
         .highlight_min(subset=['MAE','MSE','RMSE'],color='#1a3a1a')
         .set_properties(**{'text-align':'center'}), use_container_width=True)
 
-    st.markdown("#### 📊 Metric Comparison")
+    st.markdown("####  Metric Comparison")
     fig, axes = plt.subplots(1,4,figsize=(16,3.5)); fig.patch.set_facecolor('#0d1117')
     for ax,m in zip(axes,['MAE','MSE','RMSE','R² Score']):
         vals=df_r[m]; bars=ax.bar(vals.index,vals.values,color=COLORS,edgecolor='#0d1117',width=0.5)
@@ -316,7 +310,7 @@ def show_reg_results(df_r, preds, X_sc, y, show_avp, show_lc):
     plt.tight_layout(); st.pyplot(fig); plt.close()
 
     if show_avp:
-        st.markdown("#### 🔍 Actual vs Predicted")
+        st.markdown("####  Actual vs Predicted")
         fig, axes = plt.subplots(1,4,figsize=(20,4)); fig.patch.set_facecolor('#0d1117')
         for ax,((mn,(yp,yte)),color) in zip(axes, zip(preds.items(),COLORS)):
             r2=r2_score(yte,yp)
@@ -329,7 +323,7 @@ def show_reg_results(df_r, preds, X_sc, y, show_avp, show_lc):
         plt.tight_layout(); st.pyplot(fig); plt.close()
 
     if show_lc:
-        st.markdown("#### 📚 Learning Curves")
+        st.markdown("####  Learning Curves")
         fig, axes = plt.subplots(1,4,figsize=(20,4)); fig.patch.set_facecolor('#0d1117')
         for ax,(mn,mk) in zip(axes,REG_MODELS.items()):
             reg=mk()
@@ -345,20 +339,17 @@ def show_reg_results(df_r, preds, X_sc, y, show_avp, show_lc):
             ax.grid(True,alpha=0.2); ax.spines[['top','right']].set_visible(False)
         plt.tight_layout(); st.pyplot(fig); plt.close()
 
-# ══════════════════════════════════════════════════════════════════════════════
-# SIDEBAR
-# ══════════════════════════════════════════════════════════════════════════════
 with st.sidebar:
-    st.markdown("## 🤖 ML Dashboard")
+    st.markdown("##  ML Dashboard")
     st.markdown("---")
-    task = st.radio("**Task Type**", ["🔵 Classification", "🟠 Regression"])
+    task = st.radio("**Task Type**", [" Classification", " Regression"])
     st.markdown("---")
-    ds_source = st.radio("**Dataset Source**", ["📦 Built-in Dataset", "📂 Upload CSV"])
+    ds_source = st.radio("**Dataset Source**", [" Built-in Dataset", " Upload CSV"])
     st.markdown("---")
 
     uploaded_file = None; target_col = None; ds_name = None
 
-    if ds_source == "📦 Built-in Dataset":
+    if ds_source == " Built-in Dataset":
         if "Classification" in task:
             ds_name = st.selectbox("**Dataset**", list(CLF_LOADERS.keys()))
         else:
@@ -377,16 +368,12 @@ with st.sidebar:
     st.markdown("---")
     st.markdown("<p style='color:#8b949e;font-size:0.8em;'>B.Tech AI & DS · MBM University<br>Jodhpur, Rajasthan · 2026</p>",unsafe_allow_html=True)
 
-# ── Hero ──────────────────────────────────────────────────────────────────────
 st.markdown("""<div class='hero'>
-  <h1>🤖 ML MODEL COMPARISON DASHBOARD</h1>
+  <h1> ML MODEL COMPARISON DASHBOARD</h1>
   <p>Classification &amp; Regression &nbsp;|&nbsp; Built-in + Custom CSV &nbsp;|&nbsp; 4 Algorithms &nbsp;|&nbsp; All Metrics</p>
 </div>""", unsafe_allow_html=True)
 
-# ══════════════════════════════════════════════════════════════════════════════
-# CSV UPLOAD FLOW
-# ══════════════════════════════════════════════════════════════════════════════
-if ds_source == "📂 Upload CSV":
+if ds_source == " Upload CSV":
     if uploaded_file is None:
         st.markdown("""<div class='upload-hint'>
           <h3 style='color:#58a6ff;margin:0;'>📂 Upload Your Own CSV Dataset</h3>
@@ -428,9 +415,6 @@ if ds_source == "📂 Upload CSV":
     except Exception as e:
         st.error(f"❌ Error: {e}\n\nTip: Make sure features are mostly numeric and the target column is correct.")
 
-# ══════════════════════════════════════════════════════════════════════════════
-# BUILT-IN DATASET FLOW
-# ══════════════════════════════════════════════════════════════════════════════
 else:
     if "Classification" in task:
         data = CLF_LOADERS[ds_name](as_frame=True)
